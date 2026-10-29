@@ -1,0 +1,32 @@
+Test cases for No. 1
+Test	Input/action	Expected result
+1. Add	a, Sam, 0812345678	Contact added
+2. Find	f, Sam	Displays Sam's phone number
+3. Find missing contact	f, Alex	Contact not found
+4. Delete	-, Sam	Contact deleted
+5. Delete missing contact	-, Alex	Contact not found
+6. Print	p	Displays all contacts
+7. Save	s, select a new filename	Contacts saved to .pkl
+8. Save again	s, select the same file	File already exists
+9. Load	l, select the saved file	Contacts loaded
+10. Invalid choice	z	Invalid choice
+11. Quit	q	Program stops
+
+
+
+
+First, create a file named test.txt in the same folder as your Python program. Put this text inside:
+
+Good morning.
+It is morning today.
+
+
+
+
+Test	Inputs	Expected result
+1. Replace text	test.txt, morning, afternoon	Displays Done
+2. Check replacement	Open test.txt	Both occurrences change to afternoon
+3. Missing file	missing.txt, morning, afternoon	File does not exist
+4. Same strings	test.txt, morning, morning	Reports that both strings are the same
+5. Old string missing	test.txt, hello, goodbye	Old string was not found
+6. Empty old string	test.txt, leave old string empty, afternoon	Old string cannot be empty
