@@ -1,0 +1,409 @@
+INTRODUCTION TO COMPUTERS AND PROGRAMMING - LAB 14
+Full answers with code and test cases
+============================================================
+
+NOTES
+- Run each question separately.
+- Questions 1-4 use standard Python libraries only.
+- The file dialogs are provided by tkinter.
+- Save each code section in its own .py file before running it.
+
+============================================================
+QUESTION 1
+Ask for computer language names and save them to a new text file using a Save As dialog.
+The program refuses to overwrite an existing file.
+============================================================
+
+import os
+from tkinter import Tk, filedialog
+
+languages = []
+
+while True:
+    name = input('Please type a name of com lang you know (or type "exit" to finish): ')
+    if name.lower() == "exit":
+        break
+    if name.strip():
+        languages.append(name.strip())
+
+print("Then save these names on a text file ....")
+
+root = Tk()
+root.withdraw()
+
+filename = filedialog.asksaveasfilename(
+    title="Save language names",
+    defaultextension=".txt",
+    filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+)
+
+if filename:
+    if os.path.exists(filename):
+        print("That file already exists. Please choose a new filename.")
+    else:
+        with open(filename, "x", encoding="utf-8") as file:
+            for language in languages:
+                file.write(language + "\n")
+        print("Names saved successfully.")
+else:
+    print("Saving cancelled.")
+
+root.destroy()
+
+
+TEST CASES FOR QUESTION 1
+Input:
+Python
+C
+C++
+exit
+
+Expected:
+The program opens a Save As dialog. If you choose a new filename such as languages.txt,
+the file contains:
+Python
+C
+C++
+
+If you choose a filename that already exists, the program refuses to save to it.
+
+
+============================================================
+QUESTION 2
+Open the file from Question 1, print its contents, then add more names and save them.
+============================================================
+
+from tkinter import Tk, filedialog
+
+root = Tk()
+root.withdraw()
+
+filename = filedialog.askopenfilename(
+    title="Open your previous file",
+    filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+)
+
+if not filename:
+    print("No file selected.")
+else:
+    with open(filename, "r", encoding="utf-8") as file:
+        content = file.read()
+
+    print("Your current file content is:")
+    print(content, end="" if content.endswith("\n") or content == "" else "\n")
+
+    new_languages = []
+
+    while True:
+        name = input('Please type a new name of com lang to add to your file (or type "exit" to finish): ')
+        if name.lower() == "exit":
+            break
+        if name.strip():
+            new_languages.append(name.strip())
+
+    with open(filename, "a", encoding="utf-8") as file:
+        for language in new_languages:
+            file.write(language + "\n")
+
+    print("Then save these new names on your text file ....")
+    print("Updated file content is:")
+    with open(filename, "r", encoding="utf-8") as file:
+        print(file.read(), end="")
+
+root.destroy()
+
+
+TEST CASES FOR QUESTION 2
+Suppose the selected file initially contains:
+Python
+C
+C++
+
+Enter:
+Java
+JavaScript
+exit
+
+Expected final file content:
+Python
+C
+C++
+Java
+JavaScript
+
+
+============================================================
+QUESTION 3
+Replace an old string with a new string in a text file.
+============================================================
+
+filename = input("Enter a filename: ")
+old_string = input("Enter the string to be replaced: ")
+new_string = input("Enter the new string to replace the old string: ")
+
+try:
+    with open(filename, "r", encoding="utf-8") as file:
+        content = file.read()
+
+    if old_string not in content:
+        print("The old string was not found in the file.")
+    else:
+        content = content.replace(old_string, new_string)
+
+        with open(filename, "w", encoding="utf-8") as file:
+            file.write(content)
+
+        print("The file is now updated, and its new content is:")
+        print(content, end="" if content.endswith("\n") or content == "" else "\n")
+
+except FileNotFoundError:
+    print("File not found.")
+
+
+TEST CASES FOR QUESTION 3
+Create test.txt with:
+Python
+C
+C++
+Java
+JavaScript
+
+Test input:
+Enter a filename: test.txt
+Enter the string to be replaced: C
+Enter the new string to replace the old string: Rust
+
+Expected:
+The file is now updated, and its new content is:
+Python
+Rust
+Rust++
+Java
+JavaScript
+
+Note: str.replace("C", "Rust") replaces every occurrence of uppercase C, including the C
+inside C++. This follows the basic replace() method used in the question.
+
+
+============================================================
+QUESTION 4
+Phonebook manager using a dictionary, pickle, file dialogs, and exception handling.
+============================================================
+
+import pickle
+from tkinter import Tk, filedialog
+
+phonebook = {}
+
+def add_contact():
+    name = input("Enter contact name: ").strip()
+    if not name:
+        print("Name cannot be empty.")
+        return
+    phone = input("Enter phone number: ").strip()
+    phonebook[name] = phone
+    print("Contact added.")
+
+def delete_contact():
+    name = input("Enter the contact name to delete: ").strip()
+    try:
+        del phonebook[name]
+        print("Contact deleted.")
+    except KeyError:
+        print("Error: contact does not exist.")
+
+def find_contact():
+    name = input("Enter the contact name to find: ").strip()
+    try:
+        print(name + ": " + phonebook[name])
+    except KeyError:
+        print("Error: contact does not exist.")
+
+def save_contacts():
+    root = Tk()
+    root.withdraw()
+    filename = filedialog.asksaveasfilename(
+        title="Save phonebook",
+        defaultextension=".dat",
+        filetypes=[("Data files", "*.dat"), ("All files", "*.*")]
+    )
+    root.destroy()
+
+    if filename:
+        with open(filename, "wb") as file:
+            pickle.dump(phonebook, file)
+        print("Contacts saved.")
+    else:
+        print("Saving cancelled.")
+
+def load_contacts():
+    global phonebook
+    root = Tk()
+    root.withdraw()
+    filename = filedialog.askopenfilename(
+        title="Load phonebook",
+        filetypes=[("Data files", "*.dat"), ("All files", "*.*")]
+    )
+    root.destroy()
+
+    if filename:
+        try:
+            with open(filename, "rb") as file:
+                phonebook = pickle.load(file)
+            print("Contacts loaded.")
+        except (OSError, pickle.PickleError, EOFError, AttributeError, ValueError):
+            print("Could not load this file.")
+    else:
+        print("Loading cancelled.")
+
+def print_contacts():
+    if not phonebook:
+        print("The phonebook is empty.")
+    else:
+        for name, phone in phonebook.items():
+            print(name + ": " + phone)
+
+while True:
+    print("\nPhonebook Manager Operation:")
+    print('Press "+" to add a new contact.')
+    print('Press "-" to delete a contact.')
+    print('Press "f" to find a contact.')
+    print('Press "s" to save all contacts to a file.')
+    print('Press "l" to load previous saved contacts from a file.')
+    print('Press "p" to print out all contacts in the phonebook.')
+    print('Press "q" to quit the program.')
+
+    choice = input("Choose an operation: ").lower().strip()
+
+    if choice == "+":
+        add_contact()
+    elif choice == "-":
+        delete_contact()
+    elif choice == "f":
+        find_contact()
+    elif choice == "s":
+        save_contacts()
+    elif choice == "l":
+        load_contacts()
+    elif choice == "p":
+        print_contacts()
+    elif choice == "q":
+        print("Goodbye.")
+        break
+    else:
+        print("Invalid operation. Please try again.")
+
+
+TEST CASES FOR QUESTION 4
+Test 1: Add and print
+Input operations:
++
+Name: Sam
+Phone: 0812345678
+p
+q
+
+Expected output includes:
+Contact added.
+Sam: 0812345678
+
+Test 2: Find a contact that exists
+Choose f, enter Sam.
+Expected:
+Sam: 0812345678
+
+Test 3: Find a contact that does not exist
+Choose f, enter Alex.
+Expected:
+Error: contact does not exist.
+
+Test 4: Delete a contact that does not exist
+Choose -, enter Alex.
+Expected:
+Error: contact does not exist.
+
+Test 5: Save and load
+Choose s and save using the dialog. Then choose l and select the saved .dat file.
+Expected:
+Contacts saved.
+Contacts loaded.
+
+
+============================================================
+QUESTION 5
+Add exception handling to class Rational and function rationalTest().
+============================================================
+
+class Rational:
+    def __init__(self, numerator=0, denominator=1):
+        try:
+            divisor = self.gcd(numerator, denominator)
+            if divisor == 0:
+                raise ZeroDivisionError
+            self.__numerator = (1 if denominator > 0 else -1) * int(numerator / divisor)
+            self.__denominator = int(abs(denominator) / divisor)
+        except ZeroDivisionError:
+            raise ZeroDivisionError("Error in the constructor of class Rational!")
+
+    def __add__(self, secondRational):
+        n = self.__numerator * secondRational[1] + self.__denominator * secondRational[0]
+        d = self.__denominator * secondRational[1]
+        return Rational(n, d)
+
+    def __str__(self):
+        if self.__denominator == 1:
+            return str(self.__numerator)
+        else:
+            return str(self.__numerator) + "/" + str(self.__denominator)
+
+    def __getitem__(self, index):
+        if index == 0:
+            return self.__numerator
+        else:
+            return self.__denominator
+
+    def gcd(self, n, d):
+        if d == 0:
+            return n
+        else:
+            return self.gcd(d, n % d)
+
+
+def rationalTest(numer1, denom1, numer2, denom2):
+    try:
+        rat1 = Rational(numer1, denom1)
+        rat2 = Rational(numer2, denom2)
+        print(rat1, "+", rat2, "=", rat1 + rat2)
+    except ZeroDivisionError:
+        print("A ZeroDivisionError is encountered in the constructor of class Rational!")
+
+
+TEST CASES FOR QUESTION 5
+Test 1: Normal calculation
+rationalTest(1, 3, 2, 5)
+
+Expected:
+1/3 + 2/5 = 11/15
+
+Test 2: Denominator is zero
+rationalTest(1, 0, 2, 5)
+
+Expected:
+A ZeroDivisionError is encountered in the constructor of class Rational!
+
+Test 3: Both numerator and denominator are zero
+rationalTest(0, 0, 2, 5)
+
+Expected:
+A ZeroDivisionError is encountered in the constructor of class Rational!
+
+Test 4: Negative denominator
+rationalTest(1, -3, 2, 5)
+
+Expected:
+-1/3 + 2/5 = 1/15
+
+
+============================================================
+END OF LAB 14 ANSWERS
+============================================================
